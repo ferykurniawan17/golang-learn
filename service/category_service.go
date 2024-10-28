@@ -19,3 +19,13 @@ func (service CategorySerivce) GetCategory(id string) (*entity.Category, error) 
 
 	return caregory, nil;
 }
+
+func (service CategorySerivce) GetList() (*[]entity.Category, error) {
+	categories, err := service.Repository.GetList();
+
+	if err != nil {
+		return nil, err;
+	}
+
+	return categories, nil;
+}

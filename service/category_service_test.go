@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"go-lang/entity"
 	"go-lang/repository"
 	"testing"
@@ -14,12 +15,22 @@ var categoryService = CategorySerivce{Repository: categoryRepository}
 
 var categoryMock *entity.Category = &entity.Category{ID: "2", Name: "Fruit"}
 
+var categoriesMock *[]entity.Category = &[]entity.Category{
+	{ID: "1", Name: "Electronic"},
+	{ID: "2", Name: "Fruit"},
+	{ID: "3", Name: "Vegetable"},
+}
+
 func TestMain(m *testing.M) {
 
 	// Set up before test code
 	// Set up the mock
+	// Setup mock for function FindByID from CategoryRepository
 	categoryRepository.Mock.On("FindByID", "1").Return(nil)
 	categoryRepository.Mock.On("FindByID", "2").Return(categoryMock)
+
+	// Mocking CategoryRepository.GetList
+	categoryRepository.Mock.On("GetList").Return(categoriesMock, nil)
 
 	// Run the All test
 	m.Run()
@@ -44,5 +55,18 @@ func TestGetCategory(t *testing.T) {
 		assert.Equal(t, categoryMock, category)
 		assert.Equal(t, categoryMock.ID, category.ID)
 		assert.Equal(t, categoryMock.Name, category.Name)
+	})
+}
+
+func TestGetListCategory(t *testing.T) {
+	t.Run("Test case 1 | Get List Category", func(t *testing.T) {
+		// this will call the mock
+		categories, err := categoryService.GetList()
+
+		assert.NotNil(t, categories)
+		assert.Nil(t, err)
+		assert.NotEqual(t, 0, len(*categories))
+
+		fmt.Println("Categories", categories)
 	})
 }
