@@ -70,3 +70,17 @@ func TestGetListCategory(t *testing.T) {
 		fmt.Println("Categories", categories)
 	})
 }
+
+// Benchmarking the GetCategory and GetList function
+func BenchmarkGetCategory(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		categoryService.GetCategory("2")
+	}
+}
+
+// Benchmarking the GetList function
+func BenchmarkGetListCategory(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		categoryService.GetList()
+	}
+}
