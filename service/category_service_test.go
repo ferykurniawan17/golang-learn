@@ -71,16 +71,20 @@ func TestGetListCategory(t *testing.T) {
 	})
 }
 
-// Benchmarking the GetCategory and GetList function
-func BenchmarkGetCategory(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		categoryService.GetCategory("2")
-	}
-}
+// go test -v -run=Nsdfs -bench=.
+func BenchmarkCategory(b *testing.B) {
 
-// Benchmarking the GetList function
-func BenchmarkGetListCategory(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		categoryService.GetList()
-	}
+	// Benchmarking the GetCategory and GetList function
+	b.Run("Benchmark GetCategory", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			categoryService.GetCategory("2")
+		}
+	})
+
+	// Benchmarking the GetList function
+	b.Run("Benchmark GetList", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			categoryService.GetList()
+		}
+	})
 }
