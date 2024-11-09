@@ -1378,3 +1378,32 @@ alter table products add constraint price_check check (price > 1000);
 
 -- add constraint unique email to table admin --
 alter table admin add constraint unique_email unique (email);
+
+
+
+
+
+--------------------------- RUKITA ---------------------------
+
+
+sudo -i -u postgres
+psql
+
+-- psql show all databases --
+\l
+
+-- show all tables --
+\dt
+
+-- create database rukita --
+create database rukita;
+
+
+-- Username: postgres
+-- Password: FdVmu58scm2G8P3z
+-- Server: 10.20.4.158
+-- DB: backend_staging
+
+-- psql connect to rukita database backend_staging --
+
+psql -h 10.20.4.158 -U postgres -d backend_staging
