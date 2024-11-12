@@ -1407,3 +1407,58 @@ create database rukita;
 -- psql connect to rukita database backend_staging --
 
 psql -h 10.20.4.158 -U postgres -d backend_staging
+
+-- Masuk sebagai root
+sudo -i -u postgres
+
+
+-- Create username password untuk database;
+CREATE USER admin WITH PASSWORD 'password';
+
+-- Grant all privileges to user admin;
+GRANT ALL PRIVILEGES ON DATABASE belajar TO admin;
+
+-- Login as user admin;
+psql -U admin -d belajar
+
+
+
+ALTER TABLE buildings_pointofinterest ADD COLUMN search_important2 boolean not null default false;
+ALTER TABLE buildings_pointofinterest ADD COLUMN search_popularity2 double precision not null default 1;
+
+
+{"district_id":3173010,"date_updated":"2024-06-06T06:19:21.668746Z","subdistrict_id":3173010003,"category_id":18,"date_deleted":null,"name_en":"Sudirman","postal_code":null,"deleted_by":null,"id":2810,"created_by":"kumala","booster":false,"name":"Sudirman","slug":"sudirman","tag":null,"address":"Karet Tengsin Kecamatan Tanah Abang Kota Jakarta Pusat Daerah Khusus Ibukota Jakarta","lon":106.81683243411933,"province_id":31,"lat":-6.206509508936848,"is_deleted":false,"updated_by":null,"city_id":3173,"date_created":"2024-06-06T06:19:21.668722Z","country_id":84}
+
+// Create query insert from data above
+
+INSERT INTO buildings_pointofinterest
+  (district_id, date_updated, subdistrict_id, category_id, date_deleted, name_en, postal_code, deleted_by, id, created_by, booster, name, slug, tag, address, lon, province_id, lat, is_deleted, updated_by, city_id, date_created, country_id)
+  VALUES
+  (3173010, '2024-06-06T06:19:21.668746Z', 3173010003, 18, null, 'Sudirman', null, null, 2810, 'kumala', false, 'Sudirman', 'sudirman', null, 'Karet Tengsin Kecamatan Tanah Abang Kota Jakarta Pusat Daerah Khusus Ibukota Jakarta', 106.81683243411933, 31, -6.206509508936848, false, null, 3173, '2024-06-06T06:19:21.668722Z', 84);
+
+
+SELECT * FROM buildings_pointofinterest where id IN (640, 708, 432, 2938);
+
+[
+{"district_id":3273250,"date_updated":"2023-12-20T08:55:03.316211Z","subdistrict_id":3273250004,"category_id":2,"date_deleted":null,"name_en":"Universitas Pendidikan Indonesia","postal_code":null,"deleted_by":null,"id":432,"created_by":"kumala@rukita.co","booster":false,"name":"Universitas Pendidikan Indonesia","slug":"universitas-pendidikan-indonesia","tag":"UPI,upi bandung,upi lembang","address":"Jl. Dr. Setiabudi No.229, Isola, Kec. Sukasari, Kota Bandung, Jawa Barat 40154, Indonesia","lon":107.5936498601473,"province_id":32,"lat":-6.86241422260081,"is_deleted":false,"updated_by":"kumala","city_id":3273,"date_created":"2022-01-14T09:17:12.146405Z","country_id":84},
+{"district_id":3374070,"date_updated":"2024-06-21T07:20:08.804534Z","subdistrict_id":3374070004,"category_id":2,"date_deleted":null,"name_en":"Universitas Diponegoro (UNDIP)","postal_code":null,"deleted_by":null,"id":640,"created_by":"kumala","booster":false,"name":"Universitas Diponegoro (UNDIP)","slug":"universitas-diponegoro-undip","tag":"UNDIP","address":"Jl. Prof. Sudarto No.13, Tembalang, Kec. Tembalang, Kota Semarang, Jawa Tengah 50275, Indonesia","lon":110.4408910250658,"province_id":33,"lat":-7.051961979310572,"is_deleted":false,"updated_by":"kumala","city_id":3374,"date_created":"2022-06-22T07:42:27.255738Z","country_id":84},
+{"district_id":3404070,"date_updated":"2023-09-19T06:31:52.590361Z","subdistrict_id":3404070001,"category_id":2,"date_deleted":null,"name_en":"Universitas Gadjah Mada","postal_code":null,"deleted_by":null,"id":708,"created_by":"kumala","booster":false,"name":"Universitas Gadjah Mada (UGM)","slug":"universitas-gadjah-mada-ugm","tag":"UGM","address":"Bulaksumur, Caturtunggal, Kec. Depok, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55281","lon":110.37749912945203,"province_id":34,"lat":-7.7713680901618325,"is_deleted":false,"updated_by":"kumala","city_id":3404,"date_created":"2022-08-04T06:45:14.271629Z","country_id":84},
+{"district_id":3578030,"date_updated":"2024-07-09T08:45:58.716727Z","subdistrict_id":3578030004,"category_id":2,"date_deleted":null,"name_en":"Universitas Negeri Surabaya (UNESA) Ketintang","postal_code":null,"deleted_by":null,"id":2938,"created_by":"kumala","booster":false,"name":"Universitas Negeri Surabaya (UNESA) Ketintang","slug":"universitas-negeri-surabaya-unesa-ketintang","tag":"unesa ketintang,unesa kampus 1","address":"Jl. Ketintang, Ketintang, Kec. Gayungan, Surabaya, Jawa Timur 60231","lon":112.72725346393304,"province_id":35,"lat":-7.315252913834344,"is_deleted":false,"updated_by":null,"city_id":3578,"date_created":"2024-07-09T08:45:58.716706Z","country_id":84}
+]
+
+-- Create bulk query insert from data above
+
+
+INSERT INTO buildings_pointofinterest
+  (district_id, date_updated, subdistrict_id, category_id, date_deleted, name_en, postal_code, deleted_by, id, created_by, booster, name, slug, tag, address, lon, province_id, lat, is_deleted, updated_by, city_id, date_created, country_id)
+  VALUES
+  (3374070, '2024-06-21T07:20:08.804534Z', 3374070004, 2, null, 'Universitas Diponegoro (UNDIP)', null, null, 640, 'kumala', false, 'Universitas Diponegoro (UNDIP)', 'universitas-diponegoro-undip', 'UNDIP', 'Jl. Prof. Sudarto No.13, Tembalang, Kec. Tembalang, Kota Semarang, Jawa Tengah 50275, Indonesia', 110.4408910250658, 33, -7.051961979310572, false, 'kumala', 3374, '2022-06-22T07:42:27.255738Z', 84),
+  (3404070, '2023-09-19T06:31:52.590361Z', 3404070001, 2, null, 'Universitas Gadjah Mada', null, null, 708, 'kumala', false, 'Universitas Gadjah Mada (UGM)', 'universitas-gadjah-mada-ugm', 'UGM', 'Bulaksumur, Caturtunggal, Kec. Depok, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55281', 110.37749912945203, 34, -7.7713680901618325, false, 'kumala', 3404, '2022-08-04T06:45:14.271629Z', 84),
+  (3578030, '2024-07-09T08:45:58.716727Z', 3578030004, 2, null, 'Universitas Negeri Surabaya (UNESA) Ketintang', null, null, 2938, 'kumala', false, 'Universitas Negeri Surabaya (UNESA) Ketintang', 'universitas-negeri-surabaya-unesa-ketintang', 'unesa ketintang,unesa kampus 1', 'Jl. Ketintang,', 112.72725346393304, 35, -7.315252913834344, false, null, 3578, '2024-07-09T08:45:58.716706Z', 84),
+  (3273250, '2023-12-20T08:55:03.316211Z', 3273250004, 2, null, 'Universitas Pendidikan Indonesia', null, null, 432, '', false, 'Universitas Pendidikan Indonesia', 'universitas-pendidikan-indonesia', 'UPI,upi bandung,upi lembang', 'Jl. Dr. Setiabudi No.229, Isola, Kec. Sukasari, Kota Bandung, Jawa Barat 40154, Indonesia', 107.5936498601473, 32, -6.86241422260081, false, 'kumala', 3273, '2022-01-14T09:17:12.146405Z', 84);
+
+-- Insert query for 3273250
+INSERT INTO buildings_pointofinterest
+  (district_id, date_updated, subdistrict_id, category_id, date_deleted, name_en, postal_code, deleted_by, id, created_by, booster, name, slug, tag, address, lon, province_id, lat, is_deleted, updated_by, city_id, date_created, country_id)
+  VALUES
+  (3273250, '2023-12-20T08:55:03.316211Z', 3273250004, 2, null, 'Universitas Pendidikan Indonesia', null, null, 432, '', false, 'Universitas Pendidikan Indonesia', 'universitas-pendidikan-indonesia', 'UPI,upi bandung,upi lembang', 'Jl. Dr. Setiabudi No.229, Isola, Kec. Sukasari, Kota Bandung, Jawa Barat 40154, Indonesia', 107.5936498601473, 32, -6.86241422260081, false, 'kumala', 3273, '2022-01-14T09:17:12.146405Z', 84);
