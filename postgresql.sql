@@ -1559,10 +1559,10 @@ INSERT INTO public.asset_poi_important
 -- JOIN TABLE buildings_building and buildings_pointofinterest with asset_poi_important
 
 SELECT
-  asset.id,
+  asset.id AS asset_id,
   asset.building_name,
-  poi.id,
-  poi.name,
+  poi.id AS poi_id,
+  poi.name AS poi_name,
   api.score
 FROM
   buildings_building AS asset
