@@ -1480,3 +1480,94 @@ VALUES
   (3171030, '2023-12-28T10:03:10.117328Z', 3171030005, 7, null, 'MRT Station Haji Nawi', null, null, 255, null, false, 'Stasiun MRT Haji Nawi', 'stasiun-mrt-haji-nawi', '', 'Haji Nawi, Cipete Sel., Kec. Cilandak, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta, Indonesia', 106.7973327, 31, -6.2666813, false, 'kumala', 3171, '2021-08-06T04:37:23.011144Z', 84),
   (3172050, '2023-09-15T10:19:41.612276Z', 3172050007, 8, null, 'LRT Station Cawang', null, null, 2081, 'kumala', false, 'Stasiun LRT Cawang', 'stasiun-lrt-cawang', null, 'Jl. Letjen M.T. Haryono, RT.1/RW.6, Cawang, Kec. Kramat jati, Kota Jakarta Timur, Daerah Khusus Ibukota Jakarta 13630', 106.87122696395305, 31, -6.245874227130332, false, null, 3172, '2023-09-15T10:19:41.612254Z', 84),
   (3171100, '2023-09-25T06:55:20.408688Z', 3171100003, 8, null, 'LRT Station Rasuna Said', null, null, 2148, 'kumala', false, 'Stasiun LRT Rasuna Said', 'stasiun-lrt-rasuna-said', null, 'Plaza Festival, RT.2/RW.5, Kuningan, Karet Kuningan, Setiabudi, South Jakarta City, Jakarta 12940', 106.83247114665583, 31, -6.2225156586833235, false, null, 3171, '2023-09-25T06:55:20.408663Z', 84);
+
+
+[
+{"district_id":3171100,"date_updated":"2024-06-06T06:51:51.822062Z","subdistrict_id":3171100002,"category_id":18,"date_deleted":null,"name_en":"Kuningan","postal_code":null,"deleted_by":null,"id":2809,"created_by":"kumala","booster":false,"name":"Kuningan","slug":"kuningan","tag":null,"address":"Karet Kuningan Kecamatan Setiabudi Kota Jakarta Selatan Daerah Khusus Ibukota Jakarta","lon":106.82477777656867,"province_id":31,"lat":-6.216444197978109,"is_deleted":false,"updated_by":"kumala","city_id":3171,"date_created":"2024-06-06T06:14:45.555152Z","country_id":84}
+]
+
+-- Create query to insert data above
+
+INSERT INTO buildings_pointofinterest
+  (district_id, date_updated, subdistrict_id, category_id, date_deleted, name_en, postal_code, deleted_by, id, created_by, booster, name, slug, tag, address, lon, province_id, lat, is_deleted, updated_by, city_id, date_created, country_id)
+VALUES
+  (3171100, '2024-06-06T06:51:51.822062Z', 3171100002, 18, null, 'Kuningan', null, null, 2809, 'kumala', false, 'Kuningan', 'kuningan', null, 'Karet Kuningan Kecamatan Setiabudi Kota Jakarta Selatan Daerah Khusus Ibukota Jakarta', 106.82477777656867, 31, -6.216444197978109, false, 'kumala', 3171, '2024-06-06T06:14:45.555152Z', 84);
+
+
+
+-- Create table public.buildings_building
+
+CREATE TABLE buildings_building (
+  id SERIAL PRIMARY KEY,
+  building_name VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO buildings_building (building_name) VALUES ('Gedung A'), ('Gedung B'), ('Gedung C'), ('Gedung D'), ('Gedung E');
+
+SELECT * FROM buildings_building;
+
+
+-- Create table public.buildings_pointofinterest
+
+CREATE TABLE buildings_pointofinterest (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO
+  buildings_pointofinterest (name) VALUES ('Kantor Pos'), ('Kantor Polisi'), ('Kantor Desa'), ('Kantor Kecamatan'), ('Kantor Bupati'), ('MRT Station'), ('LRT Station'), ('Stasiun Kereta'), ('Bandara'), ('Pelabuhan');
+
+
+ALTER TABLE buildings_pointofinterest ADD COLUMN search_important boolean not null default false;
+ALTER TABLE buildings_pointofinterest ADD COLUMN search_popularity double precision not null default 1;
+
+UPDATE buildings_pointofinterest SET search_important = true WHERE name ILIKE '%Station%';
+UPDATE buildings_pointofinterest set search_important = true WHERE id=8;
+UPDATE buildings_pointofinterest SET search_popularity=3 WHERE id=6;
+UPDATE buildings_pointofinterest SET search_popularity=2 WHERE id=8;
+
+CREATE TABLE public.asset_poi_important (
+  asset_id integer NOT NULL,
+  poi_id integer NOT NULL,
+  score double precision NOT NULL,
+
+  PRIMARY KEY (asset_id, poi_id),
+  FOREIGN KEY (asset_id) REFERENCES buildings_building (id),
+  FOREIGN KEY (poi_id) REFERENCES buildings_pointofinterest (id)
+);
+
+-- Insert table public.asset_poi_important
+
+INSERT INTO public.asset_poi_important
+  (asset_id, poi_id, score)
+  VALUES
+  (1, 6, 3),
+  (1, 7, 2),
+  (2, 6, 3),
+  (2, 8, 2),
+  (3, 6, 3),
+  (3, 7, 2),
+  (4, 6, 3),
+  (4, 8, 2),
+  (5, 6, 3),
+  (5, 8, 2);
+
+-- JOIN TABLE buildings_building and buildings_pointofinterest with asset_poi_important
+
+SELECT
+  asset.id,
+  asset.building_name,
+  poi.id,
+  poi.name,
+  api.score
+FROM
+  buildings_building AS asset
+  JOIN asset_poi_important AS api ON asset.id = api.asset_id
+  JOIN buildings_pointofinterest AS poi ON api.poi_id = poi.id
+WHERE asset.id = 1
+ORDER BY api.score DESC
+LIMIT 1;
