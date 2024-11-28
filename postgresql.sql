@@ -1504,6 +1504,9 @@ CREATE TABLE buildings_building (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE buildings_building ADD COLUMN lat double precision NOT NULL DEFAULT 0;
+ALTER TABLE buildings_building ADD COLUMN lon double precision NOT NULL DEFAULT 0;
+
 INSERT INTO buildings_building (building_name) VALUES ('Gedung A'), ('Gedung B'), ('Gedung C'), ('Gedung D'), ('Gedung E');
 
 SELECT * FROM buildings_building;
@@ -1517,6 +1520,49 @@ CREATE TABLE buildings_pointofinterest (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE buildings_pointofinterest ADD COLUMN lat double precision NOT NULL DEFAULT 0;
+ALTER TABLE buildings_pointofinterest ADD COLUMN lon double precision NOT NULL DEFAULT 0;
+
+-- Create table buildings_buildingpointinterest
+-- Table mapping between buildings_building and buildings_pointofinterest
+CREATE TABLE buildings_buildingpointinterest (
+  id SERIAL PRIMARY KEY,
+  building_id INTEGER NOT NULL,
+  point_of_interest_id INTEGER NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (building_id) REFERENCES buildings_building (id),
+  FOREIGN KEY (point_of_interest_id) REFERENCES buildings_pointofinterest (id)
+);
+
+INSERT INTO buildings_buildingpointinterest
+  (building_id, point_of_interest_id)
+VALUES
+  (1, 1),
+  (1, 6),` // search_important: true, search_popularity: 3`
+  (1, 3),
+
+  (2, 4),
+  (2, 7),` // search_important: true, search_popularity: 1`
+  (2, 6),` // search_important: true, search_popularity: 3`
+
+  (3, 7),` // search_important: true, search_popularity: 1`
+  (3, 8),` // search_important: true, search_popularity: 2`
+  (3, 9),
+
+  (4, 1),
+  (4, 2),
+  (4, 3),
+
+  (5, 2),
+  (5, 3),
+  (5, 5);
+
+-- add field distance to buildings_buildingpointinterest
+ALTER TABLE buildings_buildingpointinterest ADD COLUMN distance double precision NOT NULL default 1;
+
+UPDATE buildings_buildingpointinterest SET distance=2 WHERE building_id=2 AND point_of_interest_id=7;
 
 INSERT INTO
   buildings_pointofinterest (name) VALUES ('Kantor Pos'), ('Kantor Polisi'), ('Kantor Desa'), ('Kantor Kecamatan'), ('Kantor Bupati'), ('MRT Station'), ('LRT Station'), ('Stasiun Kereta'), ('Bandara'), ('Pelabuhan');
@@ -1571,3 +1617,349 @@ FROM
 WHERE asset.id = 1
 ORDER BY api.score DESC
 LIMIT 1;
+
+-- Get data from buildings_building and buildings_pointofinterest with search_important = true
+SELECT 
+  asset.id AS building_id,
+  asset.building_name,
+  poimap.point_of_interest_id AS poi_id,
+  poimap.distance AS distance,
+  poi.search_important,
+  poi.search_popularity
+FROM
+  buildings_building AS asset
+  JOIN buildings_buildingpointinterest AS poimap
+ON asset.id = poimap.building_id
+  JOIN buildings_pointofinterest AS poi
+ON poi.id = poimap.point_of_interest_id
+WHERE poi.search_important=true
+ORDER by asset.id ASC;
+
+
+
+
+
+WITH t AS (
+    SELECT DISTINCT ON (category_id)
+    	poi.id, poi.name, poi.date_created, poi.date_updated, poi.is_deleted, 
+    	poi.date_deleted, poi.deleted_by, poi.name_en, poi.created_by, poi.updated_by, poi.address, 
+    	poi.booster, poi.category_id, cp.name as category_name, poi.city_id, poi.country_id, 
+    	poi.district_id, poi.lat, poi.lon, poi.postal_code, poi.province_id, poi.subdistrict_id, poi.tag, poi.slug
+    FROM 
+    	buildings_pointofinterest poi
+    LEFT JOIN 
+    	buildings_categorypoi cp ON poi.category_id = cp.id
+    WHERE 
+    	poi.is_deleted = false
+    ORDER BY category_id
+) SELECT t.id, t.name FROM t;
+
+-- execute script.sql
+psql -U username -d database_name -f path/to/script.sql
+
+
+-- buildings_pointofinterest
+-- id |       name       |        created_at         |        updated_at         | search_important | search_popularity | lat | lon 
+-- ----+------------------+---------------------------+---------------------------+------------------+-------------------+-----+-----
+--   1 | Kantor Pos       | 2024-11-13 10:34:49.99641 | 2024-11-13 10:34:49.99641 | f                |                 1 |   0 |   0
+--   2 | Kantor Polisi    | 2024-11-13 10:34:49.99641 | 2024-11-13 10:34:49.99641 | f                |                 1 |   0 |   0
+--   3 | Kantor Desa      | 2024-11-13 10:34:49.99641 | 2024-11-13 10:34:49.99641 | f                |                 1 |   0 |   0
+--   4 | Kantor Kecamatan | 2024-11-13 10:34:49.99641 | 2024-11-13 10:34:49.99641 | f                |                 1 |   0 |   0
+--   5 | Kantor Bupati    | 2024-11-13 10:34:49.99641 | 2024-11-13 10:34:49.99641 | f                |                 1 |   0 |   0
+--   9 | Bandara          | 2024-11-13 10:34:49.99641 | 2024-11-13 10:34:49.99641 | f                |                 1 |   0 |   0
+--  10 | Pelabuhan        | 2024-11-13 10:34:49.99641 | 2024-11-13 10:34:49.99641 | f                |                 1 |   0 |   0
+--   7 | LRT Station      | 2024-11-13 10:34:49.99641 | 2024-11-13 10:34:49.99641 | t                |                 1 |   0 |   0
+--   8 | Stasiun Kereta   | 2024-11-13 10:34:49.99641 | 2024-11-13 10:34:49.99641 | t                |                 2 |   0 |   0
+--   6 | MRT Station      | 2024-11-13 10:34:49.99641 | 2024-11-13 10:34:49.99641 | t                |                 3 |   0 |   0
+
+
+-- buildings_building
+-- id | building_name |        created_at         |        updated_at         | lat | lon 
+-- ----+---------------+---------------------------+---------------------------+-----+-----
+--   1 | Gedung A      | 2024-11-13 10:32:51.68575 | 2024-11-13 10:32:51.68575 |   0 |   0
+--   2 | Gedung B      | 2024-11-13 10:32:51.68575 | 2024-11-13 10:32:51.68575 |   0 |   0
+--   3 | Gedung C      | 2024-11-13 10:32:51.68575 | 2024-11-13 10:32:51.68575 |   0 |   0
+--   4 | Gedung D      | 2024-11-13 10:32:51.68575 | 2024-11-13 10:32:51.68575 |   0 |   0
+--   5 | Gedung E      | 2024-11-13 10:32:51.68575 | 2024-11-13 10:32:51.68575 |   0 |   0
+
+UPDATE buildings_building SET lat=-6.31 AND lon=106.68 WHERE id=1;
+
+-- Update set multiple
+-- {
+--   "less_than_5km": [
+--     {
+--       "name": "Taman Mini Indonesia Indah",
+--       "lat": -6.3020,
+--       "lon": 106.8952
+--     },
+--     {
+--       "name": "Museum Purna Bhakti Pertiwi",
+--       "lat": -6.3052,
+--       "lon": 106.8958
+--     },
+--     {
+--       "name": "Museum Transportasi",
+--       "lat": -6.3029,
+--       "lon": 106.8950
+--     },
+--     {
+--       "name": "Museum Listrik dan Energi Baru",
+--       "lat": -6.3056,
+--       "lon": 106.8962
+--     },
+--     {
+--       "name": "Taman Legenda Keong Emas",
+--       "lat": -6.3028,
+--       "lon": 106.8954
+--     },
+--     {
+--       "name": "SnowBay Waterpark TMII",
+--       "lat": -6.3041,
+--       "lon": 106.8953
+--     },
+--     {
+--       "name": "Taman Anggrek Indonesia Permai",
+--       "lat": -6.3024,
+--       "lon": 106.8960
+--     },
+--     {
+--       "name": "Taman Burung TMII",
+--       "lat": -6.3050,
+--       "lon": 106.8965
+--     },
+--     {
+--       "name": "Masjid At-Tin",
+--       "lat": -6.3034,
+--       "lon": 106.8967
+--     },
+--     {
+--       "name": "Gedung Sasana Kriya TMII",
+--       "lat": -6.3022,
+--       "lon": 106.8959
+--     }
+--   ],
+--   "greater_than_5km": [
+--     {
+--       "name": "Kota Tua Jakarta",
+--       "lat": -6.1352,
+--       "lon": 106.8133
+--     },
+--     {
+--       "name": "Taman Suropati",
+--       "lat": -6.1991,
+--       "lon": 106.8320
+--     },
+--     {
+--       "name": "Monumen Nasional (Monas)",
+--       "lat": -6.1751,
+--       "lon": 106.8272
+--     },
+--     {
+--       "name": "Pantai Ancol",
+--       "lat": -6.1187,
+--       "lon": 106.8392
+--     },
+--     {
+--       "name": "Kebun Binatang Ragunan",
+--       "lat": -6.3081,
+--       "lon": 106.8204
+--     }
+--   ]
+-- }
+
+UPDATE buildings_building SET lat=-6.31, lon=106.68 WHERE id=1;
+UPDATE buildings_building SET lat=-6.31, lon=106.68;
+
+-- update query lat lon json above dengan data buildings_pointofinterest
+
+--       "name": "Kota Tua Jakarta",
+--       "lat": -6.1352,
+--       "lon": 106.8133
+
+-- lat: -6.31
+-- lon: 106.68
+
+"lat": -6.1187,
+    "lon": 106.8392,
+
+UPDATE buildings_pointofinterest SET lat=-6.1352, lon=106.8133 WHERE id=1;
+UPDATE buildings_pointofinterest SET lat=-6.31, lon=106.68 WHERE id=2;
+UPDATE buildings_pointofinterest SET lat=-6.1187, lon=106.8392 WHERE id=3;
+UPDATE buildings_pointofinterest SET lat=-6.3056, lon=106.8962 WHERE id=4;
+UPDATE buildings_pointofinterest SET lat=-6.3028, lon=106.8954 WHERE id=5;
+UPDATE buildings_pointofinterest SET lat=-6.3108, lon=106.6921 WHERE id=6;
+UPDATE buildings_pointofinterest SET lat=-6.3174, lon=106.6753 WHERE id=7;
+UPDATE buildings_pointofinterest SET lat=-6.3050, lon=106.8965 WHERE id=8;
+UPDATE buildings_pointofinterest SET lat=-6.3034, lon=106.8967 WHERE id=9;
+UPDATE buildings_pointofinterest SET lat=-6.3022, lon=106.8959 WHERE id=10;
+
+
+
+-- lat: -6.31
+-- lon: 106.68
+-- generate lat lon with near possition above
+
+-- Query mengambil semua pointofinterest dengan search_important = true dan distance < 5km
+SELECT
+  earth_distance(ll_to_earth(poi.lat, poi.lon),ll_to_earth(-6.31, 106.68)) as distance_in_meters, poi.id, poi.search_important, poi.search_popularity
+FROM buildings_pointofinterest poi
+WHERE poi.search_important=true AND earth_distance(ll_to_earth(poi.lat, poi.lon),ll_to_earth(-6.31, 106.68)) < 5000
+ORDER BY distance_in_meters ASC;
+
+WITH t AS(
+  SELECT
+  earth_distance(ll_to_earth(poi.lat, poi.lon),ll_to_earth(-6.31, 106.68)) as distance_in_meters, poi.id, poi.search_important, poi.search_popularity
+FROM buildings_pointofinterest poi
+WHERE poi.search_important=true
+) SELECT * FROM t WHERE distance_in_meters < 5000 ORDER BY distance_in_meters ASC;
+
+
+
+SELECT
+  earth_distance(ll_to_earth(poi.lat, poi.lon), ll_to_earth(-6.31, 106.68)) AS distance_in_meters,
+  poi.id,
+  poi.search_important,
+  poi.search_popularity,
+  (poi.search_popularity / NULLIF(earth_distance(ll_to_earth(poi.lat, poi.lon), ll_to_earth(-6.31, 106.68)), 0)) AS score
+FROM
+  buildings_pointofinterest poi
+WHERE
+  poi.search_important = TRUE
+  AND earth_distance(ll_to_earth(poi.lat, poi.lon), ll_to_earth(-6.31, 106.68)) < 5000
+ORDER BY
+  score DESC;
+
+
+
+SELECT 
+        		earth_distance(ll_to_earth(poi.lat, poi.lon),ll_to_earth(-6.1951851, 106.816837)) as distance_meter, 
+    			earth_distance(ll_to_earth(poi.lat, poi.lon),ll_to_earth(-6.1951851, 106.816837)) as score,
+        		id,
+    			search_important,
+    			search_popularity
+    		FROM 
+        		buildings_pointofinterest
+    		WHERE 
+    		    search_important = TRUE AND
+    			is_deleted = FALSE AND
+        		(1 / (1   earth_distance(ll_to_earth(poi.lat, poi.lon),ll_to_earth(-6.1951851, 106.816837)))) * 0.4   (poi.search_popularity * 0.6) <= 5000
+    		
+    		ORDER BY search_popularity DESC, distance_meter ASC
+
+
+SELECT 
+        		earth_distance(ll_to_earth(lat, lon),ll_to_earth(-6.1951851, 106.816837)) as distance_meter, 
+    			earth_distance(ll_to_earth(lat, lon),ll_to_earth(-6.1951851, 106.816837)) as score,
+        		id,
+    			search_important,
+    			search_popularity
+    		FROM 
+        		buildings_pointofinterest
+    		WHERE 
+    		    search_important = TRUE AND
+        		(1 / (1 + earth_distance(ll_to_earth(lat, lon),ll_to_earth(-6.1951851, 106.816837)))) * 0.4 + (search_popularity * 0.6) <= 5000
+    		
+    		ORDER BY search_popularity DESC, distance_meter ASC;
+
+
+        (1 / (1 + earth_distance(ll_to_earth(poi.lat, poi.lon),ll_to_earth(-6.1951851, 106.816837)))) * 0.4 + (poi.search_popularity * 0.6)
+
+
+
+
+// - Idx - Nearest Distance - IsDeleted - Distance From Monas 	- Distance From PIK Ave - Category   - Is Deleted
+// - 0	 - Monas    		- false 	- 784    				- 13.045 				- category1		- false
+// - 1	 - Monas    		- false 	- 965    				- 13.237 				- category2		- false
+// - 2 	 - Monas    		- true  	- 387    				- 12.800 				- category2		- false
+// - 3 	 - Pik Ave  		- false 	- 12.214 				- 254    				- category1		- false
+// - 4 	 - Pik Ave  		- true  	- 11.593 				- 828    				- category1		- false
+// - 5 	 - Pik Ave  		- false 	- 13.131 				- 2004   				- category2		- false
+// - 6 	 - Monas    		- false 	- 2.376  				- 11.611 				- category3		- false
+// - 7 	 - Pik Ave  		- false 	- 11.054 				- 1.383  				- category4		- false
+// - 8 	 - Pik Ave  		- true  	- 11.451 				- 1.110  				- category4		- false
+// - 9 	 - Monas    		- true  	- 701    				- 11.739 				- category4		- false
+// - 10	 - Monas    		- false 	- 1.357  				- 11.233 				- category4		- false
+// - 11	 - Monas    		- false 	- 2.131  				- 13.139 				- category1		- false
+
+
+
+SELECT
+  earth_distance(ll_to_earth(lat, lon),ll_to_earth(-6.1951851, 106.816837)) as distance_meter,
+  earth_distance(ll_to_earth(lat, lon),ll_to_earth(-6.1951851, 106.816837)) as score,
+  id, search_important, search_popularity
+FROM buildings_pointofinterest WHERE search_important = TRUE AND (1 / (1 + earth_distance(ll_to_earth(lat, lon),ll_to_earth(-6.1951851, 106.816837)))) * 0.4 + (search_popularity * 0.6) <= 5000 ORDER BY search_popularity DESC, distance_meter ASC;
+
+
+
+
+
+
+
+(1 / (1   earth_distance(ll_to_earth(lat, lon),ll_to_earth(-6.1951851, 106.816837)))) * 0.4   (search_popularity * 0.6) <= 5000
+
+
+SELECT 
+  asset_id, poi_id, score
+FROM asset_poi_important AS API
+JOIN(
+  SELECT
+    asset_id, score
+  FROM asset_poi_important
+    WHERE asset_id = API.asset_id
+  ORDER BY score DESC, asset_id, poi_id LIMIT 2
+) AS SQ
+ON API.asset_id = SQ.asset_id;
+
+
+
+-- Table asset_poi_important
+--  asset_id | poi_id | score | poi_name 
+-- ----------+--------+-------+----------
+--         1 |      6 |     3 | 
+--         1 |      7 |     2 | 
+--         2 |      6 |     3 | 
+--         2 |      8 |     2 | 
+--         3 |      6 |     3 | 
+--         3 |      7 |     2 | 
+--         4 |      6 |     3 | 
+--         4 |      8 |     2 | 
+--         5 |      6 |     3 | 
+--         5 |      8 |     2 | 
+
+-- Query to get list with asset_id = 1, 2, and 3
+-- Limit 1 for each asset id
+-- sample results
+--  asset_id | poi_id | score | poi_name 
+-- ----------+--------+-------+----------
+--         1 |      6 |     3 | 
+--         2 |      6 |     3 | 
+--         3 |      6 |     3 |
+
+
+SELECT asset_id, poi_id, score, poi_name
+FROM asset_poi_important p
+WHERE (
+    SELECT COUNT(*)
+    FROM asset_poi_important sub
+    WHERE sub.asset_id = p.asset_id
+      AND sub.poi_id <= p.poi_id
+) <= 1
+AND asset_id IN (1, 2, 3)
+ORDER BY asset_id, score DESC;
+
+SELECT asset_id, poi_id, score, poi_name
+FROM asset_poi_important p
+WHERE 
+asset_id IN (1)
+ORDER BY asset_id, score DESC;
+
+SELECT COUNT(*)
+    FROM asset_poi_important sub
+    WHERE sub.asset_id = 1
+      AND sub.poi_id = 6;
+
+
+-- Asset Id: 705
+-- poi id: 117
+
+INSERT INTO asset_important_poi (asset_id, poi_id, score) VALUES (705, 117, 1.8);
