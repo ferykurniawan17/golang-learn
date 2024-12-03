@@ -299,12 +299,10 @@ INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanen
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/kost-di-kota-medan", "/location/medan", true);
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/kost-pasutri-jakarta-barat", "/collections/kost-pasutri-pasangan", true);
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/kost-eksklusif-jakarta-pusat-terbaik", "/search/location/city/jakarta-pusat-3173", true);
-INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/kost-dekat-stasiun-bogor", "/location/bogor", true);
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/kost-bali-murah-bulanan", "/location/bali", true);
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/zodiak-bulan-ini-aries", "/stories/zodiak-aries-bulan-ini", true);
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/kost-dekat-kampus-blok-m", "/location/blok-m", true);
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/rincian-tarif-tol-mudik-lebaran-2022", "/stories/rincian-tarif-tol-mudik-lebaran", true);
-INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/zodiak-bulan-ini-aries", "/stories/zodiak-aries-bulan-ini", true);
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/cara-perpanjang-paspor-online-2022", "/stories/cara-perpanjang-paspor-online", true);
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/cara-membuat-paspor-online-2022", "/stories/cara-membuat-paspor-online", true);
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/ucapan-selamat-idul-fitri-2022", "/stories/ucapan-idul-fitri", true);
@@ -541,5 +539,13 @@ INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanen
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/kost-dekat-rs-harapan-kita", "/sewa/kost/dekat/rumah-sakit-anak-dan-bunda-harapan-kita-336", true);
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/kost-dekat-uin-sunan-kalijaga", "/sewa/kost/dekat/uin-sunan-kalijaga-yogyakarta-709", true);
 INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/kost-kalibata", "/sewa/kost/kelurahan/kalibata-3171080001", true);
+
+
+
+
+
+-- Duplicate source_path
+INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/zodiak-bulan-ini-aries", "/stories/zodiak-aries-bulan-ini", true);
+INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ("/stories/kost-dekat-stasiun-bogor", "/location/bogor", true);
 
 
