@@ -1,0 +1,2 @@
+INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ('/sewa/kost/kelurahan/tanjung-duren-selatan-3174040002', '/sewa/kost/dekat/tanjung-duren-3045', true);
+INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ('/sewa/kost/kelurahan/tanjung-duren-utara-3174040001', '/sewa/kost/dekat/tanjung-duren-3045', true);
