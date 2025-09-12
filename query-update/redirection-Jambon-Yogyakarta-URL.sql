@@ -1,0 +1,1 @@
+INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ('/place/one-residence-jambon-yogyakarta', '/place/one-residence-gamping-yogyakarta', true);

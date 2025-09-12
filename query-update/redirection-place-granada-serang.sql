@@ -1,0 +1,3 @@
+INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ('/place/granada-serang', '/place/uma-kost-granada-serang', true);
+INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ('/place/griya-tambora', '/place/uma-kost-griya-tambora', true);
+INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ('/place/ladika-beji', '/place/uma-kost-ladika-beji', true);

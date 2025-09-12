@@ -1,0 +1,1 @@
+INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ('/place/tdm-mansion-tanjung-duren', '/place/rukita-tropis-tanjung-duren', true);
