@@ -1,0 +1,1 @@
+INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ('/place/uma-kost-amara-sawah-besar', '/place/uma-kost-amara-pasar-baru', true);

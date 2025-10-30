@@ -1,0 +1,2 @@
+    INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ('/kost/dekat/stasiun-kali-deres-3218', '/kost/dekat/stasiun-kalideres-3218', true);
+    INSERT INTO seo_geo_page_redirection (source_path, redirection_path, is_permanent) VALUES ('/apartemen/dekat/stasiun-kali-deres-3218', '/apartemen/dekat/stasiun-kalideres-3218', true);
